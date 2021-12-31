@@ -5,13 +5,20 @@
       <div class="row">
         <div class="col-12">
           <div class="row">
-            <div class="col-3 my-2">
+            <div class="col-6 my-2">
               <input
                 v-model="search"
                 type="text"
                 class="form-control form-control-sm"
                 placeholder="search"
               />
+            </div>
+            <div class="col-6 my-2">
+              <Link
+                href="user/create"
+                class="btn btn-primary btn-sm d-inline-block"
+                >Create</Link
+              >
             </div>
           </div>
         </div>
@@ -48,12 +55,18 @@
 </template>
 <script setup>
 import { Inertia } from "@inertiajs/inertia";
+import { Link } from "@inertiajs/inertia-vue3";
 import { ref } from "@vue/reactivity";
 import { watch } from "@vue/runtime-core";
 import Paginator from "../Shared/Paginator.vue";
-defineProps({ users: Object, time: String });
-let search = ref("");
-watch(search, (value) => {
-  Inertia.get("/", { search: value }, { preserveState: true });
-});
+import throttle from "lodash/throttle";
+
+let props = defineProps({ users: Object, time: String, filters: Object });
+let search = ref(props.filters.search);
+watch(
+  search,
+  throttle(function (value) {
+    Inertia.get("/", { search: value }, { preserveState: true,replace:true });
+  }, 500)
+);
 </script>
